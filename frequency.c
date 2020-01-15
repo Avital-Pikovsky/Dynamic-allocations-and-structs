@@ -1,14 +1,25 @@
+#include<stdlib.h>
 #include<stdio.h>
 #include<ctype.h>
 #include"frequency.h"
+#define NUM_LETTERS ((int)26)
 
-void memoryAlloctionError(void) {
 
-   printf("Memory allocation error. Aborting!\n");
+
+//A function prints an error in case of memory allocation error
+//Stops running the program
+void memoryAlloctionError() {
+
+   printf("Memory allocation ERROR!\n");
    exit(1);
 }
 
-node* newNode(void){
+
+//*********Node***********
+
+
+//A function that allocates space in memory for the node
+node* newNode(){
 
    node* n;
 
@@ -18,17 +29,21 @@ node* newNode(void){
    return n;
 }
 
+
+//A function that initializes the node
 node* resetNode(node* n, char ch){
+   
    n->letter = ch;
    n->count = 0;
    n->hasChild = FALSE;
    n->isEndOfWord = FALSE;
-   for(int i=0 ; i<NUM_LETTERS ; ++i){ 
+   for(int i=0 ; i<NUM_LETTERS ; i++){
        (n->children)[i] = NULL;
    }
    return n; 
 }
 
+//A function that creates a new node
 node* createNode(char ch){
 
    node* createdNode;
@@ -36,6 +51,7 @@ node* createNode(char ch){
    return  resetNode(createdNode, ch);
 }
 
+//free the memory of the node
 void freeNode(node* n){
 
    if(n==NULL){
@@ -45,7 +61,7 @@ void freeNode(node* n){
      free(n);
    }
    else{
-     for(int i=0 ; i<NUM_LETTERS ; ++i){
+     for(int i=0 ; i<NUM_LETTERS ; i++){
         freeNode((n->children)[i]);
      }
    }
@@ -53,20 +69,22 @@ void freeNode(node* n){
 }
 
 
+//**********Trie***********
 
-trie* newTrie(void){
+//A function that allocates space in memory for the trie
+trie* newTrie(){
 
    trie* t;
    if(!(t = (trie*)malloc(sizeof(trie))))
-      memoryAlloctionError();
+       memoryAlloctionError();
    return t;
 }
 
 
-
+//A function that initializes the trie
 trie* resetTrie(trie* t){
    
-   for(int i=0 ; i<NUM_LETTERS ; ++i){
+   for(int i=0 ; i<NUM_LETTERS ; i++){
       t->children[i] = NULL;
    }
    t->topical = NULL;
@@ -78,27 +96,59 @@ trie* resetTrie(trie* t){
 }
 
 
-
-trie* createTrie(void){
+//A function that creates a new trie
+trie* createTrie(){
    trie* createdTrie;
    createdTrie = newTrie();
    return resetTrie(createdTrie);
 }
 
+
+
+
+//A function that prints the trie
+void printTrie(trie* root){
+
+   if(root == NULL) return;
+   if(isEmpty(root)) return;
+   for(int i=0 ; i<NUM_LETTERS ; i++){
+      if(root->children[i] == NULL)
+        continue;
+      root->topical = root->children[i];
+        printWords(root);
+   }
+} 
+  
+///free the memory of the trie  
+void freeTrie(trie* t){
+   
+   if(t == NULL) return;
+   for(int i=0 ; i<NUM_LETTERS ; i++){
+      freeNode(t->children[i]);
+   }
+   free(t);
+}
+
+
+//boolean function that checks whether the tree is empty or not
 boolean isEmpty(trie* root){
     return root->empty;
 }
 
 
+
+//*********Read&Print***********
+
+//A function that gets trie and character, checks if the character is
+// alphabetic and build the trie, returns the word length.
 int readLetter(trie* root, int c){
    int index;
    int wordLen = 0;
    if(!(isalpha(c))){
-      if(root->topical != NULL){
-        root->topical->count++;
-        root->topical->isEndOfWord = TRUE;
-        root->topical = NULL;
-      }
+      if(root->topical == NULL) return 0;
+   root->topical->count++;
+   root->topical->isEndOfWord = TRUE;
+   root->topical = NULL;
       return wordLen;
    }
    wordLen++;
@@ -119,6 +169,10 @@ int readLetter(trie* root, int c){
    return wordLen;
 }
 
+
+
+
+//The function reads the list of words read in the input
 trie* readText(){
    
    int c;
@@ -130,55 +184,56 @@ trie* readText(){
         if(wordLen > root->MaxWordLen)
            root->MaxWordLen = wordLen;
    }
-    free(root->word);
-    if(!(root->word = (char*)malloc(1+sizeof(char)*(root->MaxWordLen))))
-        memoryAlloctionError();
+   free(root->word);
+   if(!(root->word = (char*)malloc(1+sizeof(char)*(root->MaxWordLen))))
+       memoryAlloctionError();
    return root;
 }
 
 
+//Print the list of words read in the input along with the number of occurrences per word sorted in descending lexicographic order
 void printWordsReverse(trie* root){
    
-   int p = 0;
-   int i;
+   static int tmp = 0;
    node* topical;
-   root->word[p++] = root->topical->letter;
+   root->word[tmp++] = root->topical->letter;
 
 
    if(root->topical->hasChild){
-     for(i=NUM_LETTERS-1 ; i>=0 ; --i){
+     for(int i=NUM_LETTERS-1 ; i>=0 ; i--){
         if(root->topical->children[i] == NULL)
           continue;
         topical = root->topical; //remember
         root->topical = root->topical->children[i];
         printWordsReverse(root);
         root->topical = topical; //recall
-        }
-    }
-    else{
+     }
+   }
+   else{
         if(root->topical->isEndOfWord){
-          root->word[p]='\0';
+          root->word[tmp]='\0';
           printf("%s\t%ld\n", root->word, root->topical->count);
         }
-        --p;
-        return;
-        }
-    if(root->topical->isEndOfWord){
-        root->word[p]='\0';
+     --tmp;
+     return;
+   }
+   if(root->topical->isEndOfWord){
+          root->word[tmp]='\0';
           printf("%s\t%ld\n", root->word, root->topical->count);
-    }
-    --p;
-
+        }
+     --tmp;
+   
 }
 
 
-
+//Print the list of words read in the input along with the number of occurrences
+// per word sorted in descending lexicographic order
 void printTrieReverse(trie* root){
      
-     int i;
+ 
      if(root == NULL) return;
      if(isEmpty(root)) return;
-     for(i=NUM_LETTERS-1 ; i>=0 ; --i){
+     for(int i=NUM_LETTERS-1 ; i>=0 ; i--){
         if(root->children[i] == NULL)
           continue;
         root->topical = root->children[i];
@@ -187,18 +242,18 @@ void printTrieReverse(trie* root){
 }
 
 
-
+//Print the list of words read in the input
 void printWords(trie* root){
 
-  int p = 0;
+   static int tmp = 0;
    node* topical;
-   root->word[p++] = root->topical->letter;
+   root->word[tmp++] = root->topical->letter;
    if(root->topical->isEndOfWord){
-     root->word[p] = '\0';
+     root->word[tmp] = '\0';
      printf("%s\t%ld\n", root->word, root->topical->count);
    }
    if(root->topical->hasChild){
-     for(int i=0 ; i<NUM_LETTERS ; ++i){
+     for(int i=0 ; i<NUM_LETTERS ; i++){
         if(root->topical->children[i] == NULL)
            continue;
         topical = root->topical;
@@ -208,371 +263,9 @@ void printWords(trie* root){
      }
    }
    else{
-        --p;
+        --tmp;
         return;
    }
-   --p;
+
+   --tmp;
 }
-
-
-
-void printTrie(trie* root){
-
-   if(root == NULL) return;
-   if(isEmpty(root)) return;
-   for(int i=0 ; i<NUM_LETTERS ; ++i){
-      if(root->children[i] == NULL)
-        continue;
-      root->topical = root->children[i];
-      printWords(root);
-   }
-} 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

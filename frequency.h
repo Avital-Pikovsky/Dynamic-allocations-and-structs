@@ -3,6 +3,9 @@
 
 typedef enum {FALSE=0, TRUE=1} boolean; 
 
+#ifndef Node
+#define Node
+
 typedef struct node { 
   
    char letter; 
@@ -12,7 +15,10 @@ typedef struct node {
    boolean hasChild;
    
 } node; 
+#endif
 
+#ifndef Trie
+#define Trie
 
 typedef struct trie {
    
@@ -23,20 +29,20 @@ typedef struct trie {
    boolean empty;
 
 } trie;
+#endif
 
-void memoryAlloctionError(void);
-node* newNode(void);
+void memoryAlloctionError();
+node* newNode();
 node* resetNode(node* n, char ch);
 void freeNode(node* n);
-trie* newTrie(void);
+trie* newTrie();
 trie* resetTrie(trie* t);
-trie* createTrie(void);
+trie* createTrie();
 boolean isEmpty(trie* root);
-int charIndex(char c);
 int readLetter(trie* root, int c);
 trie* readText();
 void printWordsReverse(trie* root);
 void printTrieReverse(trie* root);
 void printWords(trie* root);
 void printTrie(trie* root);
-void usage(char* programName, char* message);
+void freeTrie(trie* t);
