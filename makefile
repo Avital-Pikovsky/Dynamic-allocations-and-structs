@@ -1,9 +1,9 @@
 CC = gcc
 FLAGS = -Wall -g
 
-all: main
+all: frequency
 
-main: main.o frequency.o
+frequency: main.o frequency.o
 	$(CC) $(FLAGS) -o main main.o frequency.o
 
 main.o: main.c frequency.h
@@ -15,4 +15,4 @@ frequency.o: frequency.c frequency.h
 .PHONY: clean all
 
 clean:
-	rm -f *.o main
+	rm -f *.o frequency
