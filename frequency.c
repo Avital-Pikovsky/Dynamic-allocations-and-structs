@@ -25,14 +25,14 @@ node* newNode(){
 
    if(!(n = (node*)malloc(sizeof(node))))
      memoryAlloctionError();
-   
+
    return n;
 }
 
 
 //A function that initializes the node
 node* resetNode(node* n, char ch){
-   
+
    n->letter = ch;
    n->count = 0;
    n->hasChild = FALSE;
@@ -40,7 +40,7 @@ node* resetNode(node* n, char ch){
    for(int i=0 ; i<NUM_LETTERS ; i++){
        (n->children)[i] = NULL;
    }
-   return n; 
+   return n;
 }
 
 //A function that creates a new node
@@ -83,14 +83,14 @@ trie* newTrie(){
 
 //A function that initializes the trie
 trie* resetTrie(trie* t){
-   
+
    for(int i=0 ; i<NUM_LETTERS ; i++){
       t->children[i] = NULL;
    }
    t->topical = NULL;
    t->empty = TRUE;
    t->MaxWordLen = 0;
-   
+
    return t;
 
 }
@@ -117,11 +117,11 @@ void printTrie(trie* root){
       root->topical = root->children[i];
         printWords(root);
    }
-} 
-  
-///free the memory of the trie  
+}
+
+///free the memory of the trie
 void freeTrie(trie* t){
-   
+
    if(t == NULL) return;
    for(int i=0 ; i<NUM_LETTERS ; i++){
       freeNode(t->children[i]);
@@ -145,15 +145,18 @@ int readLetter(trie* root, int c){
    int index;
    int wordLen = 0;
    if(!(isalpha(c))){
-      if(root->topical == NULL) return 0;
-   root->topical->count++;
-   root->topical->isEndOfWord = TRUE;
-   root->topical = NULL;
-      return wordLen;
+	  if(c != ' ' && c != '\t' && c != '\n') return wordLen;
+    if(root->topical == NULL) return wordLen;
+    root->topical->count++;
+    root->topical->isEndOfWord = TRUE;
+    root->topical = NULL;
+     return wordLen;
    }
    wordLen++;
    c = tolower(c);
    index = c-'a';
+   //if(index < 'a' || index > 'z')
+	 //  return wordLen;
    if(root->topical == NULL){ //new word - start from root
      if(root->children[index] == NULL)
         root->children[index] = createNode(c);
@@ -174,12 +177,13 @@ int readLetter(trie* root, int c){
 
 //The function reads the list of words read in the input
 trie* readText(){
-   
+
    int c;
    int wordLen;
    trie* root;
    root = createTrie();
    while((c=getchar()) != EOF){
+
         wordLen = readLetter(root,c);
         if(wordLen > root->MaxWordLen)
            root->MaxWordLen = wordLen;
@@ -193,7 +197,7 @@ trie* readText(){
 
 //Print the list of words read in the input along with the number of occurrences per word sorted in descending lexicographic order
 void printWordsReverse(trie* root){
-   
+
    static int tmp = 0;
    node* topical;
    root->word[tmp++] = root->topical->letter;
@@ -222,15 +226,15 @@ void printWordsReverse(trie* root){
           printf("%s\t%ld\n", root->word, root->topical->count);
         }
      --tmp;
-   
+
 }
 
 
 //Print the list of words read in the input along with the number of occurrences
 // per word sorted in descending lexicographic order
 void printTrieReverse(trie* root){
-     
- 
+
+
      if(root == NULL) return;
      if(isEmpty(root)) return;
      for(int i=NUM_LETTERS-1 ; i>=0 ; i--){

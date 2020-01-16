@@ -4,7 +4,7 @@ FLAGS = -Wall -g
 all: frequency
 
 frequency: main.o frequency.o
-	$(CC) $(FLAGS) -o main main.o frequency.o
+	$(CC) $(FLAGS) -o frequency main.o frequency.o
 
 main.o: main.c frequency.h
 	$(CC) $(FLAGS) -c main.c 
