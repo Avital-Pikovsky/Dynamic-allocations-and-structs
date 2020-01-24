@@ -34,6 +34,7 @@ typedef struct trie {
 void memoryAlloctionError();
 node* newNode();
 node* resetNode(node* n, char ch);
+node* createNode(char ch);
 void freeNode(node* n);
 trie* newTrie();
 trie* resetTrie(trie* t);
