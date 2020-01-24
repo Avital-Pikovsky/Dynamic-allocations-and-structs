@@ -155,9 +155,8 @@ int readLetter(trie* root, int c){
    wordLen++;
    c = tolower(c);
    index = c-'a';
-   //if(index < 'a' || index > 'z')
-	 //  return wordLen;
-   if(root->topical == NULL){ //new word - start from root
+
+   if(root->topical == NULL){ 
      if(root->children[index] == NULL)
         root->children[index] = createNode(c);
      root->topical = root->children[index];
