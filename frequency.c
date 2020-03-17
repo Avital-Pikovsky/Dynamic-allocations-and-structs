@@ -1,7 +1,7 @@
-#include<stdlib.h>
-#include<stdio.h>
-#include<ctype.h>
-#include"frequency.h"
+#include <stdlib.h>
+#include <stdio.h>
+#include <ctype.h>
+#include "frequency.h"
 #define NUM_LETTERS ((int)26)
 
 
@@ -57,14 +57,13 @@ void freeNode(node* n){
    if(n==NULL){
      return;
    }
-   if((n->hasChild) == 0){
-     free(n);
-   }
-   else{
-     for(int i=0 ; i<NUM_LETTERS ; i++){
+   if((n->hasChild) != 0){
+      for(int i=0 ; i<NUM_LETTERS ; i++){
         freeNode((n->children)[i]);
-     }
+      }
+     
    }
+   free(n);
    return;
 }
 
@@ -126,6 +125,7 @@ void freeTrie(trie* t){
    for(int i=0 ; i<NUM_LETTERS ; i++){
       freeNode(t->children[i]);
    }
+   free(t->word);
    free(t);
 }
 
@@ -146,10 +146,10 @@ int readLetter(trie* root, int c){
    int wordLen = 0;
    if(!(isalpha(c))){
 	  if(c != ' ' && c != '\t' && c != '\n') return wordLen;
-    if(root->topical == NULL) return wordLen;
-    root->topical->count++;
-    root->topical->isEndOfWord = TRUE;
-    root->topical = NULL;
+     if(root->topical == NULL) return wordLen;
+     root->topical->count++;
+     root->topical->isEndOfWord = TRUE;
+     root->topical = NULL;
      return wordLen;
    }
    wordLen++;

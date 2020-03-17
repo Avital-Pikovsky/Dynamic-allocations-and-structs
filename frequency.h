@@ -1,4 +1,4 @@
-#include<stdlib.h>
+#include <stdlib.h>
 #define NUM_LETTERS ((int)26)
 
 typedef enum {FALSE=0, TRUE=1} boolean; 
